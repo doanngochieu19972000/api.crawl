@@ -10,6 +10,6 @@ app.use(bodyParser.json())
 let routes = require('./api/routes/routes') 
 routes(app)
 
-app.listen(port)
+app.listen(port, '104.236.38.116')
 
 console.log('RESTful API server started on: ' + port)
