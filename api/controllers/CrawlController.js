@@ -14,34 +14,47 @@ module.exports = {
 		  });
 		  
 		  const page = await browser.newPage();
+		  var match = req.params.id == 0 
+				? "https://shopee.vn/api/v4/search/search_items?by=pop&limit=30&match_id=88201679&newest=0&order=desc&page_type=shop&version=2" 
+				: "https://shopee.vn/api/v4/search/search_items?by=pop&limit=30&match_id=88201679&newest=0&order=desc&page_type=shop&shop_categoryids=" + req.params.id + "&version=2";
+
+		 var link = req.params.id == 0 
+		 ? "https://shopee.vn/apple_flagship_store?page=0"
+		 : "https://shopee.vn/apple_flagship_store?page=0&shopCollection=" + req.params.id;
 
 		  page.on("response", async (response) => {
-			if (response.url().includes("shop_categoryids"))
-        		console.log(response.url());  
+				
 
-			if (response.url().includes(req.params.id)) {
-			  const data = await response.json();
-			  resolve(data);
-			  
-			  data.items.forEach(item => {
-				result.push({
-					name: item.item_basic.name,
-					retailprice: item.item_basic.price_before_discount / 100000,
-					saleprice: item.item_basic.price / 100000,
-					image: "https://cf.shopee.vn/file/" + item.item_basic.image
-				})
-			  });
-			  
-			  console.log(result);
-			  res.json(result);
-			}
+				if (response.url().includes(match))
+        		   console.log(response.url());  
+
+				if (response.url().includes(match)) {
+					
+					const data = await response.json();
+					resolve(data);
+					
+					data.items.forEach(item => {
+						result.push({
+							name: item.item_basic.name,
+							retailprice: item.item_basic.price_before_discount / 100000,
+							saleprice: item.item_basic.price / 100000,
+							image: "https://cf.shopee.vn/file/" + item.item_basic.image
+						})
+					});
+					
+					res.json(result);
+				}
+
+				
 		  });
 
-		  await page.goto("https://shopee.vn/apple_flagship_store??page=0&shopCollection=" + req.params.id, {
-			waitUntil: "networkidle0",
-		  });
+		  await page.goto(link, {
+					waitUntil: "networkidle0",
+		  		});
 
-		  await browser.close();
+		  		await browser.close();
+
+		  
 		});
 	}
 }
